@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:c="http://www.springframework.org/schema/c"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+                           http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
+                           http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.1.xsd
+                           http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.1.xsd
+       					   http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+    
+    <mvc:annotation-driven/>
+    
+    <context:component-scan base-package="chapter4"></context:component-scan>
+    			   
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+    	<property name="prefix">
+    		<value>/WEB-INF/pages/</value>
+    	</property>
+    	<property name="suffix">
+    		<value>.jsp</value>
+    	</property>
+    </bean>
+    
+    <bean id="loginService" class="chapter4.service.LoginService" scope="request"
+    	p:userId="#{request.getParameter('userId')}"
+    	p:password="#{request.getParameter('password')}">
+    	<aop:scoped-proxy/>
+    </bean>
+    
+    <bean id="registrationService" class="chapter4.service.RegistrationService" scope="request"
+    	p:userId="#{request.getParameter('userId')}"
+    	p:password="#{request.getParameter('password')}"
+    	p:firstName="#{request.getParameter('fname')}"
+    	p:lastName="#{request.getParameter('lname')}">
+    	<aop:scoped-proxy/>
+    </bean>
+    
+    <bean id="registrationDaoSpring" class="chapter4.dao.RegistrationDaoSpring">
+    	<constructor-arg ref="jdbcTemplate" />
+    </bean>
+	
+	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName">
+			<value>com.mysql.jdbc.Driver</value>
+		</property>
+		<property name="url">
+			<value>jdbc:mysql://localhost:3306/phonebook</value>
+		</property>
+		<property name="username">
+			<value>root</value>
+		</property>
+		<property name="password">
+			<value>admin</value>
+		</property>
+	</bean>
+	
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<constructor-arg ref="dataSource" />
+	</bean>
+	
+	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+		<property name="dataSource" ref="dataSource"/>
+	</bean>
+</beans>
